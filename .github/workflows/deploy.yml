@@ -50,6 +50,12 @@ jobs:
         run: npm install
         working-directory: ${{ env.PROJECT_DIR }}
 
+      - name: Add Vite environment types
+        run: |
+          mkdir -p src
+          printf '/// <reference types="vite/client" />\n' > src/vite-env.d.ts
+        working-directory: ${{ env.PROJECT_DIR }}
+
       - name: Build project
         run: npm run build
         working-directory: ${{ env.PROJECT_DIR }}
