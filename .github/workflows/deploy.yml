@@ -52,7 +52,6 @@ jobs:
 
       - name: Add Vite environment types
         run: |
-          mkdir -p src
           printf '/// <reference types="vite/client" />\n' > src/vite-env.d.ts
         working-directory: ${{ env.PROJECT_DIR }}
 
