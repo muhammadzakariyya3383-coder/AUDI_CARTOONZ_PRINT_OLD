@@ -29,16 +29,35 @@ jobs:
         with:
           node-version: 22
 
+      - name: Extract project ZIP
+        run: |
+          mkdir -p extracted
+          ZIP_FILE=$(find . -maxdepth 1 -type f -name '*.zip' | head -n 1)
+          if [ -z "$ZIP_FILE" ]; then
+            echo "Project ZIP file not found"
+            exit 1
+          fi
+          unzip -q "$ZIP_FILE" -d extracted
+          PACKAGE_JSON=$(find extracted -name package.json -print -quit)
+          if [ -z "$PACKAGE_JSON" ]; then
+            echo "package.json not found inside ZIP"
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$PACKAGE_JSON")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
       - name: Install dependencies
         run: npm install
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Build project
         run: npm run build
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Upload build files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ${{ env.PROJECT_DIR }}/dist
 
   deploy:
     needs: build
